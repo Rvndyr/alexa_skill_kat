@@ -20,4 +20,3 @@ const buildSpeechletResponse = (title, output, repromptText, shouldEndSession)  
 module.exports = {
     buildSpeechletResponse,
 }
-

@@ -1,6 +1,6 @@
 const {
   getTitle,
-} = require('./NewsApi');
+} = require('./NewsAPI');
 
 
 
@@ -32,7 +32,7 @@ const getWelcomeResponse = () => {
 
 const getArticleTitle = () => getTitle().then(articles => {
   const cardTitle = 'News Updates';
-  const speechOutput = 'Here are the latest articles ' + articles;
+  const speechOutput = 'Here are the latest articles. ' + articles.join(' ');
 
   const repromptText = 'Would you like to continue hearing the latest articles?'
   const shouldEndSession = false;
@@ -67,8 +67,6 @@ const intentRequest = (intentRequest, session) => {
     switch (intentName) {
         case 'articlesTitleIntent':
             return  getArticleTitle(); /* this will get you the news article sources API call */;
-        case ''
-            return
         case 'AMAZON.StopIntent':
         case 'AMAZON.CancelIntent':
             return getEndResponse();

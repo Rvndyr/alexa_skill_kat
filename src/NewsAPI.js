@@ -33,16 +33,16 @@ const getTitle = (endpoint, params) => {
         const title = article.title;
         const description = article.description;
 
-        return "Article title is ${title}. Description is: ${description}. "
+        return `Article title is ${title}. Description is: ${description}. `
       })
 
 
       // console.log(data);
-
+      return data;
     })
 }
 
-console.log(getTitle())
+// console.log(getTitle())
 
 module.exports = {
     getTitle,
