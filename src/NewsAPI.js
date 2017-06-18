@@ -8,6 +8,8 @@ const {
   //     body = JSON.parse(body);
 
 // const URL_BASE = 'https://newsapi.org/v1/sources?language=en';
+
+
 // get the list of sources
 const getSources = (endpoint, params) => {
   return axios.get('https://newsapi.org/v1/sources?language=en').then(response => {
@@ -24,6 +26,17 @@ const getSources = (endpoint, params) => {
   })
 }
 console.log(getSources())
+
+const getSourceAt = (num) => {
+  return axios.get('https://newsapi.org/v1/sources?language=en').then(response => {
+    const sources = response.data.sources;
+    const sourceChosen = sources[num];
+
+    return sourceChosen;
+  })
+
+}
+
 
 // get the list of titles
 const getTitle = (endpoint, params) => {
@@ -61,4 +74,6 @@ const getTitleAt = (num) => {
 module.exports = {
     getTitle,
     getTitleAt,
+    getSources,
+    getSourceAt,
 };

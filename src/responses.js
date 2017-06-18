@@ -1,6 +1,8 @@
 const {
   getTitle,
   getTitleAt,
+  getSources,
+  getSourceAt,
 } = require('./NewsAPI');
 
 
@@ -13,12 +15,12 @@ const initSessionAttributes = () => {
 }
 
 const getWelcomeResponse = () => {
-    const cardTitle = 'Whats New?';
-    const speechOutput = 'Welcome to read about it, You can ask me for updates on articles. ';
+    const cardTitle = 'Articles';
+    const speechOutput = 'Welcome to read about it, You can ask me for sources on articles. ';
     // only giving updates on the newsAPI for now -- 6/13/17
     // If the user either does not reply to the welcome message or says something that is not
     // understood, they will be prompted again with this text.
-    const repromptText = 'Ask me about New articles';
+    const repromptText = 'ask me about sources';
     const shouldEndSession = false;
 
     return Promise.resolve()
@@ -29,7 +31,21 @@ const getWelcomeResponse = () => {
             shouldEndSession
         ]);
 }
+const getSourcesById = () => getSources().then(sources => {
+  const cardTitle = 'Article Sources';
+  const speechOutput = 'Here is a list of Sources';
 
+  const repromptText = 'Ask me to list Sources to choose an article'
+  const shouldEndSession = false;
+
+  return [
+    cardTitle,
+    speechOutput,
+    repromptText,
+    shouldEndSession
+  ];
+
+})
 
 const getArticleTitle = () => getTitle().then(articles => {
   const cardTitle = 'News Updates';
@@ -45,6 +61,25 @@ const getArticleTitle = () => getTitle().then(articles => {
     shouldEndSession
   ];
 })
+
+const getSourcesNum = (request) => Promise.resolve().then(_ => {
+  const sourceNum = request.intent.slots.SourceNum.value;
+  return getSourceAt(sourceNum).then(sourceChosen => {
+    const title = sourceChosen.name;
+    const cardTitle = `${title}`;
+    const speechOutput = `Source title is ${title}.`;
+
+    const repromptText = 'ask me to list sources or cancel';
+    const shouldEndSession = false;
+
+    return [
+      cardTitle,
+      speechOutput,
+      repromptText,
+      shouldEndSession,
+    ];
+  })
+});
 
 const getArticleNum = (request) => Promise.resolve().then(_ => {
   const articleNum = request.intent.slots.ArticleNum.value;
@@ -69,7 +104,6 @@ const getArticleNum = (request) => Promise.resolve().then(_ => {
   })
 });
 
-console.log(getArticleNum());
 
 const getEndResponse = () => {
     const cardTitle = 'Conversation completed.';
@@ -92,6 +126,8 @@ const intentRequest = (intentRequest, session) => {
     switch (intentName) {
         case 'articlesTitleIntent':
             return  getArticleTitle(); /* this will get you the news article sources API call */;
+        case 'sourcesIdIntent':
+            return getSourcesById();  /* list all sources */
         case 'articlesTitleNumIntent':
             return getArticleNum(intentRequest); /* this will get you the specific number for each title 1-10*/
         case 'AMAZON.StopIntent':
