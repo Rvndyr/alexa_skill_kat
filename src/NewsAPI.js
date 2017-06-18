@@ -24,26 +24,40 @@ const {
 // ]).join('&');
 //
 const getTitle = (endpoint, params) => {
-    return axios.get('https://newsapi.org/v1/articles?source=techcrunch&apiKey=40a682dcba244bbeb832872deb8b6b78').then(response => {
-      // console.log(response);
+    return axios.get(`https://newsapi.org/v1/articles?source=techcrunch&apiKey=${newsApiKey}`).then(response => {
+      console.log(response);
 
       const articles = response.data.articles;
 
-      const data = articles.map(article => {
+      const data = articles.map((article, index) => {
         const title = article.title;
         const description = article.description;
 
-        return `Article title is ${title}. Description is: ${description}. `
+        return `Article number ${index+1} is ${title}.`
       })
 
-
-      // console.log(data);
+      console.log("AFTER THE FIRST CONSOLE");
+      console.log(data);
       return data;
     })
 }
 
-// console.log(getTitle())
+const getTitleAt = (num) => {
+  return axios.get(`https://newsapi.org/v1/articles?source=techcrunch&apiKey=${newsApiKey}`).then(response => {
+    console.log(response);
+
+    const articles = response.data.articles;
+    const articleChosen = articles[num];
+
+
+    return articleChosen;
+  })
+}
+
+
+console.log(getTitle())
 
 module.exports = {
     getTitle,
+    getTitleAt,
 };

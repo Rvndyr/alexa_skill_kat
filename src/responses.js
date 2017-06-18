@@ -1,5 +1,6 @@
 const {
   getTitle,
+  getTitleAt,
 } = require('./NewsAPI');
 
 
@@ -45,6 +46,26 @@ const getArticleTitle = () => getTitle().then(articles => {
   ];
 })
 
+const getArticleNum = (request) => Promise.resolve().then(_ => {
+  const articleNum = request.intent.slots.ArticleNum.value;
+  return getTitleAt(articleNum).then(articleChosen => {
+    const title = articleChosen.title;
+    const description = articleChosen.description;
+
+    const cardTitle = `${title}`;
+    const speechOutput = `Article title is ${title}. Description is: ${description}`;
+
+    const repromptText = 'ask me to list the articles or cancel';
+    const shouldEndSession = false;
+
+    return [
+      cardTitle,
+      speechOutput,
+      repromptText,
+      shouldEndSession
+    ];
+  })
+});
 
 const getEndResponse = () => {
     const cardTitle = 'Conversation completed.';
@@ -67,6 +88,8 @@ const intentRequest = (intentRequest, session) => {
     switch (intentName) {
         case 'articlesTitleIntent':
             return  getArticleTitle(); /* this will get you the news article sources API call */;
+        case 'articlesTitleNumIntent':
+            return getArticleNum(intentRequest); /* this will get you the specific number for each title 1-10*/
         case 'AMAZON.StopIntent':
         case 'AMAZON.CancelIntent':
             return getEndResponse();
