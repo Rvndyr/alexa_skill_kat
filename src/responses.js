@@ -4,7 +4,9 @@ const {
   getSources,
   getSourceAt,
 } = require('./NewsAPI');
-
+const {
+  datasources,
+} = require('./sources')
 
 
 const initSessionAttributes = () => {
@@ -33,7 +35,7 @@ const getWelcomeResponse = () => {
 }
 const getSourcesById = () => getSources().then(sources => {
   const cardTitle = 'Article Sources';
-  const speechOutput = 'Here is a list of Sources';
+  const speechOutput = 'Here is a list of Sources' + sources.join(' ');
 
   const repromptText = 'Ask me to list Sources to choose an article'
   const shouldEndSession = false;
@@ -47,23 +49,59 @@ const getSourcesById = () => getSources().then(sources => {
 
 })
 
-const getArticleTitle = () => getTitle().then(articles => {
-  const cardTitle = 'News Updates';
-  const speechOutput = 'Here are the latest articles. ' + articles.join(' ');
+const showFailInfo = () => {
+  return Promise.resolve().then(_ => {
+    const cardTitle = 'News Updates';
+    const speechOutput = 'Sorry, that source was not found. Please try again.';
 
-  const repromptText = 'Would you like to continue hearing the latest articles?'
-  const shouldEndSession = false;
+    const repromptText = 'Please give me a source title to begin.'
+    const shouldEndSession = true;
 
-  return [
-    cardTitle,
-    speechOutput,
-    repromptText,
-    shouldEndSession
-  ];
-})
+    return [
+      cardTitle,
+      speechOutput,
+      repromptText,
+      shouldEndSession
+    ];
+  })
+}
+
+const getArticleTitle = (request) => {
+  const sourceName = request.intent.slots.SourcesNum.value;
+  const sourceId = datasources[sourceName.toLowerCase()];
+  if (typeof sourceId === "undefined") {
+    return showFailInfo();
+  }
+
+// else
+  return getTitle(sourceId).then(articles => {
+    const cardTitle = 'News Updates';
+    const speechOutput = 'Here are the latest articles for ' + sourceName + '. ' + articles.join(' ');
+
+    const repromptText = 'Would you like to continue hearing the latest articles?'
+    const shouldEndSession = false;
+
+    return [
+      cardTitle,
+      speechOutput,
+      repromptText,
+      shouldEndSession
+    ];
+  });
+}
+
+getArticleTitle({
+  intent: {
+    slots: {
+      SourcesNum: {
+        value: 'the new york times'
+      }
+    }
+  }
+}).then(d => console.log(d))
 
 const getSourcesNum = (request) => Promise.resolve().then(_ => {
-  const sourceNum = request.intent.slots.SourceNum.value;
+  const sourceNum = request.intent.slots.SourcesNum.value;
   return getSourceAt(sourceNum).then(sourceChosen => {
     const title = sourceChosen.name;
     const cardTitle = `${title}`;
@@ -83,16 +121,22 @@ const getSourcesNum = (request) => Promise.resolve().then(_ => {
 
 const getArticleNum = (request) => Promise.resolve().then(_ => {
   const articleNum = request.intent.slots.ArticleNum.value;
-  return getTitleAt(articleNum).then(articleChosen => {
+  const sourceName = request.intent.slots.SourcesNum.value;
+  const sourceId = datasources[sourceName.toLowerCase()];
+  if (typeof sourceId === "undefined") {
+    return showFailInfo();
+  }
+
+  return getTitleAt(articleNum, sourceId).then(articleChosen => {
     const title = articleChosen.title;
     const description = articleChosen.description;
     const imgUrl = articleChosen.urlToImage;
-    console.log(imgUrl);
+    // console.log(imgUrl);
     const cardTitle = `${title}`;
     const speechOutput = `Article title is ${title}. Description is: ${description}`;
 
     const repromptText = 'ask me to list the articles or cancel';
-    const shouldEndSession = false;
+    const shouldEndSession = true;
 
     return [
       cardTitle,
@@ -125,9 +169,11 @@ const intentRequest = (intentRequest, session) => {
 
     switch (intentName) {
         case 'articlesTitleIntent':
-            return  getArticleTitle(); /* this will get you the news article sources API call */;
-        case 'sourcesIdIntent':
-            return getSourcesById();  /* list all sources */
+            return  getArticleTitle(intentRequest); /* this will get you the news article sources API call */;
+        // case 'sourcesIdIntent':
+        //     return getSourcesById();  /* list all sources */
+        // case 'sourcesTitleNumIntent':
+        //     return getSourcesNum(intentRequest); /*this will get you the specific number for each source title*/
         case 'articlesTitleNumIntent':
             return getArticleNum(intentRequest); /* this will get you the specific number for each title 1-10*/
         case 'AMAZON.StopIntent':
