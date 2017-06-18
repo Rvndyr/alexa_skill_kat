@@ -8,7 +8,24 @@ const {
   //     body = JSON.parse(body);
 
 // const URL_BASE = 'https://newsapi.org/v1/sources?language=en';
+// get the list of sources
+const getSources = (endpoint, params) => {
+  return axios.get('https://newsapi.org/v1/sources?language=en').then(response => {
 
+    const sources = response.data.sources;
+
+    const data = sources.map((source, index) => {
+      const name = source.name;
+
+      return `Source ${index+1} is ${name}.`
+    })
+
+    console.log(data);
+  })
+}
+console.log(getSources())
+
+// get the list of titles
 const getTitle = (endpoint, params) => {
     return axios.get(`https://newsapi.org/v1/articles?source=techcrunch&apiKey=${newsApiKey}`).then(response => {
 
