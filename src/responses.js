@@ -51,7 +51,8 @@ const getArticleNum = (request) => Promise.resolve().then(_ => {
   return getTitleAt(articleNum).then(articleChosen => {
     const title = articleChosen.title;
     const description = articleChosen.description;
-
+    const imgUrl = articleChosen.urlToImage;
+    console.log(imgUrl);
     const cardTitle = `${title}`;
     const speechOutput = `Article title is ${title}. Description is: ${description}`;
 
@@ -62,10 +63,13 @@ const getArticleNum = (request) => Promise.resolve().then(_ => {
       cardTitle,
       speechOutput,
       repromptText,
-      shouldEndSession
+      shouldEndSession,
+      imgUrl,
     ];
   })
 });
+
+console.log(getArticleNum());
 
 const getEndResponse = () => {
     const cardTitle = 'Conversation completed.';

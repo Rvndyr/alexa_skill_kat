@@ -1,12 +1,15 @@
-const buildSpeechletResponse = (title, output, repromptText, shouldEndSession)  => Object.assign({}, {
+const buildSpeechletResponse = (title, output, repromptText, shouldEndSession, imgUrl = '')  => Object.assign({}, {
     outputSpeech: {
         type: 'PlainText',
         text: output,
     },
     card: {
-        type: 'Simple',
+        type: 'Standard',
         title: `${title}`,
         content: `${output}`,
+        image: {
+          smallImageUrl: `${imgUrl}`
+        }
     },
     reprompt: {
         outputSpeech: {
